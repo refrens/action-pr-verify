@@ -16,7 +16,7 @@ inputs:
     description: 'Report test coverage'
     required: true
     default: 'true'
-  github_token:
+  github-token:
     description: 'github token'
     required: true
 runs:
