@@ -19,12 +19,30 @@ inputs:
   github-token:
     description: 'github token'
     required: true
+  run-lint:
+    description: 'run lint checks'
+    required: true
+    default: 'true'
+  run-commitlint:
+    description: 'run commitlint'
+    required: true
+    default: 'true'
+  run-tests:
+    description: 'run tests'
+    required: true
+    default: 'true'
+  test-all-files:
+    description: 'run tests for all files'
+    required: true
+    default: 'false'
+
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
 
     - uses: wagoid/commitlint-github-action@v5
+      if: ${{ inputs.run-commitlint }} == 'true'
 
     - uses: actions/setup-node@v4
       with:
@@ -41,6 +59,7 @@ runs:
 
     - name: Run linters
       uses: wearerequired/lint-action@v2
+      if: ${{ inputs.run-lint }} == 'true'
       with:
         github_token: ${{ inputs.github-token }}
         eslint: true
@@ -48,6 +67,7 @@ runs:
 
     - name: Get changed files
       id: changed-files
+      if: ${{ inputs.test-all-files }} == 'false' && ${{ inputs.run-tests == 'true' }}
       uses: tj-actions/changed-files@v43
       with:
         files: |
@@ -59,13 +79,19 @@ runs:
           **.mjs
           **.cjs
 
-    - name: test
-      if: steps.changed-files.outputs.any_changed == 'true'
+    - name: test changed files
+      if: ${{ inputs.test-all-files }} == 'false' && ${{ inputs.run-tests == 'true' }} && steps.changed-files.outputs.any_changed == 'true'
       env:
         CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
       shell: bash
       run: |
         npm run ${{ inputs.test-script }} -- ${CHANGED_FILES}
+
+    - name: test all files
+      if: ${{ inputs.test-all-files }} != 'false' && ${{ inputs.run-tests == 'true' }}
+      shell: bash
+      run: |
+        npm run ${{ inputs.test-script }}
 
     - name: Jest Coverage Comment
       if: ${{ inputs.with-coverage }} == 'true'
