@@ -1,0 +1,64 @@
+name: Verify PR
+description: 'Verify PR with lint and test checks'
+inputs:
+  node-version:  # id of input
+    description: 'Node Version'
+    required: true
+    default: '18'
+  test-script:
+    description: 'npm test script'
+    required: true
+    default: 'test:staged'
+  with-coverage:
+    description: 'Report test coverage'
+    required: true
+    default: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - uses: wagoid/commitlint-github-action@v5
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'npm'
+        registry-url: 'https://npm.pkg.github.com'
+        scope: 'refrens'
+
+    - name: install dependencies
+      run: npm ci
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run linters
+      uses: wearerequired/lint-action@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        eslint: true
+        prettier: true
+
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v43
+      with:
+        files: |
+          **.ts
+          **.tsx
+          **.js
+          **.jsx
+          **.json
+          **.mjs
+          **.cjs
+
+    - name: test
+      if: steps.changed-files.outputs.any_changed == 'true'
+      env:
+        CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+      run: |
+        npm run test:staged -- ${CHANGED_FILES}
+
+    - name: Jest Coverage Comment
+      if: ${{ inputs.with-coverage }}
+      uses: MishaKav/jest-coverage-comment@main
