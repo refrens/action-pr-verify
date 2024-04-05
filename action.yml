@@ -1,7 +1,8 @@
 name: Verify PR
 description: 'Verify PR with lint and test checks'
-color: purple
-icon: check-square
+branding:
+  color: purple
+  icon: check-square
 inputs:
   node-version:  # id of input
     description: 'Node Version'
@@ -14,7 +15,10 @@ inputs:
   with-coverage:
     description: 'Report test coverage'
     required: true
-    default: true
+    default: 'true'
+  github_token:
+    description: 'github token'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -31,13 +35,14 @@ runs:
 
     - name: install dependencies
       run: npm ci
+      shell: bash
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ inputs.github_token }}
 
     - name: Run linters
       uses: wearerequired/lint-action@v2
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ inputs.github_token }}
         eslint: true
         prettier: true
 
@@ -58,9 +63,10 @@ runs:
       if: steps.changed-files.outputs.any_changed == 'true'
       env:
         CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+      shell: bash
       run: |
-        npm run test:staged -- ${CHANGED_FILES}
+        npm run ${{ inputs.test-script }} -- ${CHANGED_FILES}
 
     - name: Jest Coverage Comment
-      if: ${{ inputs.with-coverage }}
+      if: ${{ inputs.with-coverage }} == 'true'
       uses: MishaKav/jest-coverage-comment@main
