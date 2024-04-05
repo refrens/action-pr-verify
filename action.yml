@@ -1,5 +1,7 @@
 name: Verify PR
 description: 'Verify PR with lint and test checks'
+color: purple
+icon: check-square
 inputs:
   node-version:  # id of input
     description: 'Node Version'
