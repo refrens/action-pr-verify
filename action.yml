@@ -37,12 +37,12 @@ runs:
       run: npm ci
       shell: bash
       env:
-        NODE_AUTH_TOKEN: ${{ inputs.github_token }}
+        NODE_AUTH_TOKEN: ${{ inputs.github-token }}
 
     - name: Run linters
       uses: wearerequired/lint-action@v2
       with:
-        github_token: ${{ inputs.github_token }}
+        github_token: ${{ inputs.github-token }}
         eslint: true
         prettier: true
 
