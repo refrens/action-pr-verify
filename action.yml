@@ -41,9 +41,6 @@ runs:
   steps:
     - uses: actions/checkout@v4
 
-    - uses: wagoid/commitlint-github-action@v5
-      if: ${{ inputs.run-commitlint }} == 'true'
-
     - uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
@@ -56,6 +53,9 @@ runs:
       shell: bash
       env:
         NODE_AUTH_TOKEN: ${{ inputs.github-token }}
+
+    - uses: wagoid/commitlint-github-action@v5
+      if: ${{ inputs.run-commitlint }} == 'true'
 
     - name: Run linters
       uses: wearerequired/lint-action@v2
