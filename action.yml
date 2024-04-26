@@ -54,7 +54,7 @@ runs:
       env:
         NODE_AUTH_TOKEN: ${{ inputs.github-token }}
 
-    - uses: wagoid/commitlint-github-action@v5
+    - uses: wagoid/commitlint-github-action@v6
       if: ${{ inputs.run-commitlint }} == 'true'
 
     - name: Run linters
