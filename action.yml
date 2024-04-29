@@ -87,7 +87,7 @@ runs:
         npm run ${{ inputs.test-script }} -- ${CHANGED_FILES}
 
     - name: test all files
-      if: ${{ inputs.test-all-files }} != 'false' && ${{ inputs.run-tests == 'true' }}
+      if: ${{ inputs.test-all-files }} == 'true' && ${{ inputs.run-tests == 'true' }}
       shell: bash
       run: |
         npm run ${{ inputs.test-script }}
