@@ -66,7 +66,7 @@ runs:
 
     - name: Get changed files
       id: changed-files
-      if: ${{ inputs.test-all-files }} == 'false' && ${{ inputs.run-tests == 'true' }}
+      if: ${{ inputs.test-all-files }} == 'false' && ${{ inputs.run-tests }} == 'true'
       uses: tj-actions/changed-files@v43
       with:
         files: |
@@ -79,7 +79,7 @@ runs:
           **.cjs
 
     - name: test changed files
-      if: ${{ inputs.test-all-files }} == 'false' && ${{ inputs.run-tests == 'true' }} && steps.changed-files.outputs.any_changed == 'true'
+      if: ${{ inputs.test-all-files }} == 'false' && ${{ inputs.run-tests }} == 'true' && steps.changed-files.outputs.any_changed == 'true'
       env:
         CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
       shell: bash
@@ -87,7 +87,7 @@ runs:
         npm run ${{ inputs.test-script }} -- ${CHANGED_FILES}
 
     - name: test all files
-      if: ${{ inputs.test-all-files }} == 'true' && ${{ inputs.run-tests == 'true' }}
+      if: ${{ inputs.test-all-files }} == 'true' && ${{ inputs.run-tests }} == 'true'
       shell: bash
       run: |
         npm run ${{ inputs.test-script }}
