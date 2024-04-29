@@ -58,12 +58,11 @@ runs:
       if: ${{ inputs.run-commitlint }} == 'true'
 
     - name: Run linters
-      uses: wearerequired/lint-action@v2
       if: ${{ inputs.run-lint }} == 'true'
-      with:
-        github_token: ${{ inputs.github-token }}
-        eslint: true
-        prettier: true
+      run: npm run lint
+      shell: bash
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.github-token }}
 
     - name: Get changed files
       id: changed-files
